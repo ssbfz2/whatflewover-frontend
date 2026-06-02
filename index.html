@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Flew Over — Daily flight tracking for your neighborhood</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>">
+  <meta name="description" content="A daily email digest of real aircraft that flew over your neighborhood. Routes, altitudes, carriers, and more — personalized to your zip code.">
+  <link rel="canonical" href="https://whatflewover.com/">
+  <meta property="og:type"         content="website">
+  <meta property="og:url"          content="https://whatflewover.com/">
+  <meta property="og:title"        content="What Flew Over">
+  <meta property="og:description"  content="A daily email digest of real aircraft that flew over your neighborhood — personalized to your zip code.">
+  <meta property="og:image"        content="https://whatflewover.com/preview.png">
+  <meta property="og:image:width"  content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:image"       content="https://whatflewover.com/preview.png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #020617;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    nav {
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #1e293b;
+    }
+    .nav-logo { font-size: 18px; font-weight: 800; color: #f8fafc; letter-spacing: -0.02em; }
+    .nav-link  { font-size: 13px; color: #475569; text-decoration: none; }
+    .nav-link:hover { color: #94a3b8; }
+
+    .hero {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 90px 32px 70px;
+      text-align: center;
+    }
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #38bdf8;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-size: clamp(38px, 6vw, 68px);
+      font-weight: 800;
+      color: #f1f5f9;
+      letter-spacing: -0.03em;
+      line-height: 1.06;
+      margin-bottom: 24px;
+    }
+    h1 span { color: #38bdf8; }
+    .subtitle {
+      font-size: 19px;
+      color: #94a3b8;
+      line-height: 1.6;
+      max-width: 580px;
+      margin: 0 auto 52px;
+    }
+
+    /* Waitlist card */
+    .card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 480px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .card h2 { font-size: 20px; font-weight: 700; color: #f8fafc; margin-bottom: 6px; }
+    .card p  { font-size: 14px; color: #64748b; margin-bottom: 28px; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 15px;
+      color: #f8fafc;
+      margin-bottom: 18px;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: inherit;
+    }
+    input:focus { border-color: #38bdf8; }
+    input::placeholder { color: #475569; }
+
+    button {
+      width: 100%;
+      background: #38bdf8;
+      color: #0f172a;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: inherit;
+      margin-top: 4px;
+    }
+    button:hover    { background: #7dd3fc; }
+    button:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+
+    .msg {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+    .msg.success { background: #052e16; border: 1px solid #16a34a; color: #86efac; }
+    .msg.error   { background: #450a0a; border: 1px solid #dc2626; color: #fca5a5; }
+
+    .fine-print {
+      font-size: 12px;
+      color: #64748b;
+      text-align: center;
+      margin-top: 14px;
+    }
+
+    /* Features */
+    .features {
+      max-width: 900px;
+      margin: 80px auto;
+      padding: 0 32px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .feature {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .feature .icon { font-size: 22px; margin-bottom: 10px; }
+    .feature h3    { font-size: 15px; font-weight: 700; color: #f8fafc; margin-bottom: 6px; }
+    .feature p     { font-size: 13px; color: #64748b; line-height: 1.5; }
+
+    /* Origin story */
+    .origin {
+      max-width: 680px;
+      margin: 0 auto 80px;
+      padding: 0 32px;
+    }
+    .origin-card {
+      background: #0c1628;
+      border: 1px solid #1e3a5f;
+      border-radius: 12px;
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .origin-label {
+      font-size: 11px;
+      color: #38bdf8;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+    .origin-card h3 { font-size: 18px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
+    .origin-card p  { font-size: 14px; color: #64748b; line-height: 1.7; }
+    .origin-card a  { color: #38bdf8; text-decoration: none; }
+
+    footer {
+      border-top: 1px solid #0f172a;
+      padding: 28px 32px;
+      text-align: center;
+      font-size: 13px;
+      color: #1e293b;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <span class="nav-logo">✈ What Flew Over</span>
+    <a href="https://greatplainsplanes.com" class="nav-link">Great Plains Planes →</a>
+  </nav>
+
+  <main>
+  <section class="hero">
+    <div class="eyebrow">✈ Daily Flight Tracking &nbsp;·&nbsp; Your Neighborhood</div>
+    <h1>What flew over<br><span>your house</span><br>today?</h1>
+    <p class="subtitle">
+      A daily email digest of real aircraft that flew over your zip code —
+      routes, altitudes, carriers, military traffic, and more.
+      Personalized to where you live.
+    </p>
+
+    <div class="card">
+      <h2>Join the waitlist</h2>
+      <p>We're rolling out city by city. Drop your email and zip and we'll let you know when your area goes live.</p>
+
+      <form id="waitlist-form" novalidate>
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com"
+               required autocomplete="email" aria-required="true">
+
+        <label for="zip">Your zip code</label>
+        <input type="text" id="zip" name="zip" placeholder="90210"
+               maxlength="5" pattern="[0-9]{5}" required
+               autocomplete="postal-code" aria-required="true">
+
+        <button type="submit" id="submit-btn">Notify me when you're in my area →</button>
+      </form>
+
+      <div class="msg" id="msg" role="alert" aria-live="assertive"></div>
+      <p class="fine-print">No spam. Unsubscribe any time. <a href="/privacy.html" style="color:#475569;">Privacy policy</a></p>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feature">
+      <div class="icon">📍</div>
+      <h3>Personalized to your zip</h3>
+      <p>Only planes that actually flew over your neighborhood — not a regional summary.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">✈</div>
+      <h3>Every flight identified</h3>
+      <p>Airline, aircraft type, registration, route, origin, destination — all in one place.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🗺</div>
+      <h3>Daily flight map</h3>
+      <p>Animated map of the day's traffic over your area, color-coded by altitude.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">✦</div>
+      <h3>Daily briefing</h3>
+      <p>A short, human-voiced summary of the day — including local news and sports.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">✦</div>
+      <h3>Special traffic</h3>
+      <p>Military, medical flights, helicopters, and unusual aircraft flagged automatically.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🏆</div>
+      <h3>Records & stats</h3>
+      <p>Highest, fastest, closest approach, longest route — tracked over time.</p>
+    </div>
+  </section>
+
+  <section class="origin">
+    <div class="origin-card">
+      <div class="origin-label">How it started</div>
+      <h3>Born in Kansas City</h3>
+      <p>
+        What Flew Over started as <a href="https://greatplainsplanes.com">Great Plains Planes</a>,
+        a personal ADS-B receiver project in Kansas City, Missouri. After a year of daily digests
+        for a small group of friends and family, it became clear this was something more people
+        wanted — wherever they lived. We're building it out city by city.
+      </p>
+    </div>
+  </section>
+  </main>
+
+  <footer>
+    What Flew Over &nbsp;·&nbsp; <a href="https://greatplainsplanes.com" style="color:#334155;">greatplainsplanes.com</a>
+  </footer>
+
+  <script>
+    const API = 'https://api.greatplainsplanes.com';
+
+    // Pre-warm
+    fetch(`${API}/health`).catch(() => {});
+
+    document.getElementById('waitlist-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      const msg = document.getElementById('msg');
+      btn.disabled = true;
+      btn.setAttribute('aria-busy', 'true');
+      btn.textContent = 'Adding you to the list…';
+      msg.style.display = 'none';
+
+      const body = {
+        email: document.getElementById('email').value.trim(),
+        zip:   document.getElementById('zip').value.trim(),
+      };
+
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60000);
+        const res = await fetch(`${API}/waitlist`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+        const data = await res.json();
+
+        msg.className = res.ok ? 'msg success' : 'msg error';
+        msg.textContent = res.ok
+          ? "✓ You're on the list. We'll email you when your area goes live."
+          : (data.detail || 'Something went wrong. Please try again.');
+        if (res.ok) e.target.reset();
+        else { btn.disabled = false; btn.removeAttribute('aria-busy'); btn.textContent = 'Notify me when you\'re in my area →'; }
+      } catch (err) {
+        msg.className = 'msg error';
+        msg.textContent = err.name === 'AbortError' ? 'Request timed out — please try again.' : 'Could not reach the server.';
+        btn.disabled = false;
+        btn.removeAttribute('aria-busy');
+        btn.textContent = 'Notify me when you\'re in my area →';
+      }
+      msg.style.display = 'block';
+    });
+
+    document.getElementById('zip').addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 5);
+    });
+  </script>
+</body>
+</html>
