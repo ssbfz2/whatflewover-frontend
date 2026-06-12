@@ -205,7 +205,7 @@
         have the sky on record before anything is promised or paid — then you'll
         get a proof of your print to approve.
       </p>
-      <a class="cta" href="mailto:digest@greatplainsplanes.com?subject=Skyprint%20availability%20%E2%80%94%20Kansas%20City&body=Hi%20%E2%80%94%20I%27d%20like%20to%20check%20availability%20for%20a%20Skyprint.%0A%0AThe%20date%3A%20%0AThe%20occasion%3A%20%0AName%20to%20print%3A%20%0ATime%20of%20the%20moment%20(optional)%3A%20%0A%0AThanks!">
+      <a class="cta" id="order-cta" href="#">
         Check my date →
       </a>
       <p class="fine-print">
@@ -220,5 +220,20 @@
     &copy; 2026 What Flew Over LLC &nbsp;·&nbsp; Kansas City, Missouri &nbsp;·&nbsp; <a href="/privacy.html">Privacy</a>
   </footer>
 
+  <script>
+    // The mailto is assembled at runtime: Cloudflare's Email Address Obfuscation
+    // rewrites static mailto: hrefs into /cdn-cgi/l/email-protection links, and its
+    // decoder mangles ones that carry subject/body params. JS-built links are left alone.
+    (function () {
+      var addr = ['digest', 'greatplainsplanes.com'].join('@');
+      var subject = 'Skyprint availability — Kansas City';
+      var body = "Hi — I'd like to check availability for a Skyprint.\n\n" +
+                 'The date: \nThe occasion: \nName to print: \n' +
+                 'Time of the moment (optional): \n\nThanks!';
+      document.getElementById('order-cta').href =
+        'mailto:' + addr + '?subject=' + encodeURIComponent(subject) +
+        '&body=' + encodeURIComponent(body);
+    })();
+  </script>
 </body>
 </html>
