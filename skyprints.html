@@ -163,18 +163,66 @@
     }
     .order-card h2 { font-size: 22px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
     .order-card p  { font-size: 14px; color: #64748b; line-height: 1.7; margin-bottom: 26px; }
-    .cta {
-      display: inline-block;
+
+    .order-card form { text-align: left; }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 15px;
+      color: #f8fafc;
+      margin-bottom: 18px;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: inherit;
+      color-scheme: dark;
+    }
+    input:focus { border-color: #38bdf8; }
+    input::placeholder { color: #475569; }
+    .field-note {
+      font-size: 12px;
+      color: #475569;
+      margin: -12px 0 18px;
+      line-height: 1.5;
+    }
+    button[type="submit"] {
+      width: 100%;
       background: #38bdf8;
       color: #0f172a;
+      border: none;
       border-radius: 8px;
-      padding: 14px 28px;
+      padding: 14px;
       font-size: 15px;
       font-weight: 700;
-      text-decoration: none;
+      cursor: pointer;
       transition: background 0.15s;
+      font-family: inherit;
+      margin-top: 4px;
     }
-    .cta:hover { background: #7dd3fc; }
+    button[type="submit"]:hover    { background: #7dd3fc; }
+    button[type="submit"]:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+    .msg {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+      text-align: left;
+      line-height: 1.6;
+    }
+    .msg.success { background: #052e16; border: 1px solid #16a34a; color: #86efac; }
+    .msg.error   { background: #450a0a; border: 1px solid #dc2626; color: #fca5a5; }
     .fine-print {
       font-size: 12px;
       color: #64748b;
@@ -183,37 +231,6 @@
     }
     .fine-print a { color: #38bdf8; text-decoration: none; }
 
-    .email-fallback {
-      margin-top: 22px;
-      padding: 16px 18px;
-      background: #0c1628;
-      border: 1px solid #1e3a5f;
-      border-radius: 10px;
-      text-align: left;
-    }
-    .email-fallback p { font-size: 13px; color: #94a3b8; margin-bottom: 12px; }
-    .copy-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-    .copy-row code { font-size: 14px; color: #f8fafc; word-break: break-all; }
-    .copy-btn {
-      background: #1e293b;
-      color: #cbd5e1;
-      border: 1px solid #334155;
-      border-radius: 6px;
-      padding: 7px 12px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      white-space: nowrap;
-    }
-    .copy-btn:hover { border-color: #38bdf8; color: #f8fafc; }
 
     footer {
       border-top: 1px solid #1e293b;
@@ -274,27 +291,37 @@
 
   <section class="order">
     <div class="order-card">
-      <h2>Message for availability</h2>
+      <h2>Check your date</h2>
       <p>
-        We're starting with Kansas City. Send us your date and we'll confirm we
+        We're starting with Kansas City. Tell us your date and we'll confirm we
         have the sky on record before anything is promised or paid — then you'll
         get a proof of your print to approve.
       </p>
-      <a class="cta" id="order-cta" href="#">
-        Check my date →
-      </a>
-      <div class="email-fallback" id="email-fallback" hidden>
-        <p>If your email app didn't open, just send us a note the ordinary way:</p>
-        <div class="copy-row">
-          <code id="order-email"></code>
-          <button type="button" class="copy-btn" id="copy-email">Copy address</button>
-        </div>
-        <div class="copy-row">
-          <span style="color:#64748b;font-size:13px;">date · occasion · name to print · time (optional)</span>
-          <button type="button" class="copy-btn" id="copy-template">Copy message template</button>
-        </div>
-      </div>
+
+      <form id="skyprint-form" novalidate>
+        <label for="sky-date">The date</label>
+        <input type="date" id="sky-date" name="date" required min="2026-05-30" aria-required="true">
+        <p class="field-note">Our Kansas City archive begins May 30, 2026 — and future dates can be reserved.</p>
+
+        <label for="occasion">The occasion</label>
+        <input type="text" id="occasion" name="occasion" placeholder="A birth, a wedding, a first home…" maxlength="200">
+
+        <label for="print-name">Name to print</label>
+        <input type="text" id="print-name" name="print_name" placeholder="Orville Wright" maxlength="120">
+
+        <label for="moment-time">Time of the moment (optional)</label>
+        <input type="time" id="moment-time" name="moment_time">
+        <p class="field-note">If you give us a time, the print names the flight passing closest to it.</p>
+
+        <label for="buyer-email">Your email</label>
+        <input type="email" id="buyer-email" name="email" placeholder="you@example.com" required autocomplete="email" aria-required="true">
+
+        <button type="submit" id="skyprint-submit">Check my date →</button>
+      </form>
+      <div class="msg" id="skyprint-msg" role="alert" aria-live="assertive"></div>
+
       <p class="fine-print">
+        Prefer email? Reach us at <span id="direct-email"></span>.<br>
         Outside Kansas City? We're expanding city by city —
         <a href="/">join the waitlist</a> and Skyprints will follow.
       </p>
@@ -330,38 +357,63 @@
   </script>
 
   <script>
-    // The mailto is assembled at runtime: Cloudflare's Email Address Obfuscation
-    // rewrites static mailto: hrefs into /cdn-cgi/l/email-protection links, and its
-    // decoder mangles ones that carry subject/body params. JS-built links are left alone.
-    (function () {
-      var addr = ['digest', 'greatplainsplanes.com'].join('@');
-      var subject = 'Skyprint availability — Kansas City';
-      var body = "Hi — I'd like to check availability for a Skyprint.\n\n" +
-                 'The date: \nThe occasion: \nName to print: \n' +
-                 'Time of the moment (optional): \n\nThanks!';
-      document.getElementById('order-cta').href =
-        'mailto:' + addr + '?subject=' + encodeURIComponent(subject) +
-        '&body=' + encodeURIComponent(body);
+    const API = 'https://api.greatplainsplanes.com';
+    fetch(`${API}/health`).catch(() => {});  // pre-warm
 
-      // mailto: silently does nothing on machines with no mail app configured,
-      // so the click also reveals a copyable address + message template.
-      document.getElementById('order-email').textContent = addr;
-      document.getElementById('order-cta').addEventListener('click', function () {
-        document.getElementById('email-fallback').hidden = false;
-      });
-      function wireCopy(btnId, getText) {
-        var btn = document.getElementById(btnId);
-        btn.addEventListener('click', function () {
-          var old = btn.textContent;
-          navigator.clipboard.writeText(getText()).then(function () {
-            btn.textContent = 'Copied ✓';
-            setTimeout(function () { btn.textContent = old; }, 1600);
-          });
+    // Address inserted by JS so Cloudflare's email obfuscation can't rewrite it.
+    document.getElementById('direct-email').textContent =
+      ['digest', 'greatplainsplanes.com'].join('@');
+
+    document.getElementById('skyprint-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('skyprint-submit');
+      const msg = document.getElementById('skyprint-msg');
+      btn.disabled = true;
+      btn.setAttribute('aria-busy', 'true');
+      btn.textContent = 'Checking your date…';
+      msg.style.display = 'none';
+
+      const body = {
+        email:       document.getElementById('buyer-email').value.trim(),
+        date:        document.getElementById('sky-date').value,
+        occasion:    document.getElementById('occasion').value.trim(),
+        print_name:  document.getElementById('print-name').value.trim(),
+        moment_time: document.getElementById('moment-time').value,
+      };
+
+      const reset = () => {
+        btn.disabled = false;
+        btn.removeAttribute('aria-busy');
+        btn.textContent = 'Check my date →';
+      };
+
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60000);
+        const res = await fetch(`${API}/skyprint-request`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: controller.signal,
         });
+        clearTimeout(timeout);
+        const data = await res.json();
+
+        msg.className = res.ok ? 'msg success' : 'msg error';
+        msg.textContent = res.ok
+          ? '✓ Got it. We\'ll check the archive for your date and reply by email — usually within a day. Nothing is owed unless we have your sky on record.'
+          : (data.detail || 'Something went wrong. Please try again.');
+        if (res.ok) e.target.reset();
+        else reset();
+      } catch (err) {
+        msg.className = 'msg error';
+        msg.textContent = err.name === 'AbortError'
+          ? 'Request timed out — please try again.'
+          : 'Could not reach the server. Please try again, or email us directly.';
+        reset();
       }
-      wireCopy('copy-email', function () { return addr; });
-      wireCopy('copy-template', function () { return 'Subject: ' + subject + '\n\n' + body; });
-    })();
+      msg.style.display = 'block';
+    });
   </script>
 </body>
 </html>
