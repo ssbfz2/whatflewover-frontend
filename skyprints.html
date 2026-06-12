@@ -183,6 +183,38 @@
     }
     .fine-print a { color: #38bdf8; text-decoration: none; }
 
+    .email-fallback {
+      margin-top: 22px;
+      padding: 16px 18px;
+      background: #0c1628;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      text-align: left;
+    }
+    .email-fallback p { font-size: 13px; color: #94a3b8; margin-bottom: 12px; }
+    .copy-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .copy-row code { font-size: 14px; color: #f8fafc; word-break: break-all; }
+    .copy-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { border-color: #38bdf8; color: #f8fafc; }
+
     footer {
       border-top: 1px solid #1e293b;
       padding: 28px 32px;
@@ -251,6 +283,17 @@
       <a class="cta" id="order-cta" href="#">
         Check my date →
       </a>
+      <div class="email-fallback" id="email-fallback" hidden>
+        <p>If your email app didn't open, just send us a note the ordinary way:</p>
+        <div class="copy-row">
+          <code id="order-email"></code>
+          <button type="button" class="copy-btn" id="copy-email">Copy address</button>
+        </div>
+        <div class="copy-row">
+          <span style="color:#64748b;font-size:13px;">date · occasion · name to print · time (optional)</span>
+          <button type="button" class="copy-btn" id="copy-template">Copy message template</button>
+        </div>
+      </div>
       <p class="fine-print">
         Outside Kansas City? We're expanding city by city —
         <a href="/">join the waitlist</a> and Skyprints will follow.
@@ -299,6 +342,25 @@
       document.getElementById('order-cta').href =
         'mailto:' + addr + '?subject=' + encodeURIComponent(subject) +
         '&body=' + encodeURIComponent(body);
+
+      // mailto: silently does nothing on machines with no mail app configured,
+      // so the click also reveals a copyable address + message template.
+      document.getElementById('order-email').textContent = addr;
+      document.getElementById('order-cta').addEventListener('click', function () {
+        document.getElementById('email-fallback').hidden = false;
+      });
+      function wireCopy(btnId, getText) {
+        var btn = document.getElementById(btnId);
+        btn.addEventListener('click', function () {
+          var old = btn.textContent;
+          navigator.clipboard.writeText(getText()).then(function () {
+            btn.textContent = 'Copied ✓';
+            setTimeout(function () { btn.textContent = old; }, 1600);
+          });
+        });
+      }
+      wireCopy('copy-email', function () { return addr; });
+      wireCopy('copy-template', function () { return 'Subject: ' + subject + '\n\n' + body; });
     })();
   </script>
 </body>
