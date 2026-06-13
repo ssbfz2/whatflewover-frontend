@@ -386,9 +386,13 @@
         <label for="print-name">Name to print</label>
         <input type="text" id="print-name" name="print_name" placeholder="Orville Wright" maxlength="120">
 
+        <label for="venue-address">Address of the place (optional)</label>
+        <input type="text" id="venue-address" name="address" placeholder="The hospital, venue, or home — e.g. 2401 Gillham Rd, Kansas City, MO" maxlength="300" autocomplete="off">
+        <p class="field-note">Give us the spot and the print is centered there — we'll find the coordinates, you don't have to.</p>
+
         <label for="moment-time">Time of the moment (optional)</label>
         <input type="time" id="moment-time" name="moment_time">
-        <p class="field-note">If you give us a time, the print names the flight passing closest to it.</p>
+        <p class="field-note">If you give us a time, the print names the flight passing closest to that place at that minute.</p>
 
         <label for="buyer-email">Your email</label>
         <input type="email" id="buyer-email" name="email" placeholder="you@example.com" required autocomplete="email" aria-required="true">
@@ -488,6 +492,7 @@
         date:        document.getElementById('sky-date').value,
         occasion:    document.getElementById('occasion').value.trim(),
         print_name:  document.getElementById('print-name').value.trim(),
+        address:     document.getElementById('venue-address').value.trim(),
         moment_time: document.getElementById('moment-time').value,
         product:     (document.querySelector('input[name="product"]:checked') || {}).value || 'unframed',
       };
