@@ -11,9 +11,9 @@
   <meta property="og:url"         content="https://whatflewover.com/skyprints.html">
   <meta property="og:title"       content="Skyprints — the sky above, the day they arrived">
   <meta property="og:description" content="Every real flight that crossed the Kansas City sky on the day that mattered — as a print.">
-  <meta property="og:image"       content="https://whatflewover.com/skyprint_sample.jpg?v=2">
+  <meta property="og:image"       content="https://whatflewover.com/skyprint_sample.jpg?v=3">
   <meta name="twitter:card"       content="summary_large_image">
-  <meta name="twitter:image"      content="https://whatflewover.com/skyprint_sample.jpg?v=2">
+  <meta name="twitter:image"      content="https://whatflewover.com/skyprint_sample.jpg?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -62,6 +62,7 @@
       margin-bottom: 24px;
     }
     h1 span { color: #38bdf8; }
+    #rotator { transition: opacity 0.4s ease; display: inline-block; }
     .subtitle {
       font-size: 18px;
       color: #94a3b8;
@@ -75,7 +76,13 @@
       margin: 48px auto 0;
       padding: 0 32px;
     }
-    .poster-wrap img {
+    .poster-pair {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+    .poster-pair figure { flex: 1 1 0; margin: 0; min-width: 0; }
+    .poster-thumb {
       width: 100%;
       height: auto;
       display: block;
@@ -83,6 +90,14 @@
       border: 1px solid #1e293b;
       box-shadow: 0 30px 80px rgba(0,0,0,0.55);
       cursor: zoom-in;
+    }
+    .poster-pair figcaption {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #64748b;
+      text-align: center;
+      margin-top: 8px;
     }
     .zoom-hint {
       font-size: 12px;
@@ -282,7 +297,7 @@
   <main>
   <section class="hero">
     <div class="eyebrow">Skyprints &nbsp;·&nbsp; Kansas City</div>
-    <h1>What flew over,<br><span>the day they arrived.</span></h1>
+    <h1>What flew over,<br><span id="rotator">the day they arrived.</span></h1>
     <p class="subtitle">
       Every real flight that crossed the Kansas City sky on the day your child was
       born, the day you got married, the day everything changed — recorded as it
@@ -291,10 +306,21 @@
   </section>
 
   <div class="poster-wrap">
-    <img src="/skyprint_sample.jpg?v=2" id="poster-img" role="button" tabindex="0"
-         alt="Skyprint poster: a circle of glowing flight paths over Kansas City with a child's name and birth date beneath"
-         width="1500" height="2000">
-    <p class="zoom-hint">Click the poster to see it up close ↗</p>
+    <div class="poster-pair">
+      <figure>
+        <img class="poster-thumb" src="/skyprint_sample.jpg?v=3" data-full="/skyprint_sample.jpg?v=3"
+             role="button" tabindex="0" width="1500" height="2000"
+             alt="Skyprint poster, midnight style: glowing flight paths over Kansas City with a name and date beneath">
+        <figcaption>Midnight</figcaption>
+      </figure>
+      <figure>
+        <img class="poster-thumb" src="/skyprint_sample_daylight.jpg?v=1" data-full="/skyprint_sample_daylight.jpg?v=1"
+             role="button" tabindex="0" width="1500" height="2000"
+             alt="Skyprint poster, daylight style: flight paths over Kansas City on warm paper with a name and date beneath">
+        <figcaption>Daylight</figcaption>
+      </figure>
+    </div>
+    <p class="zoom-hint">Two styles — click either to see it up close ↗</p>
     <p class="poster-caption">
       An actual day over Kansas City — 765 aircraft, colored by altitude.
       Each print is built from the real flight record of your date.
@@ -386,24 +412,46 @@
 
   <div class="lightbox" id="lightbox" role="dialog" aria-label="Poster, enlarged">
     <button class="lightbox-close" id="lightbox-close" aria-label="Close">×</button>
-    <img src="/skyprint_sample.jpg?v=2" alt="Skyprint poster, enlarged" loading="lazy">
+    <img src="/skyprint_sample.jpg?v=3" alt="Skyprint poster, enlarged" loading="lazy">
   </div>
 
   <script>
     (function () {
-      var poster = document.getElementById('poster-img');
       var box = document.getElementById('lightbox');
-      function openBox()  { box.classList.add('open'); document.body.style.overflow = 'hidden'; }
-      function closeBox() { box.classList.remove('open'); document.body.style.overflow = ''; }
-      poster.addEventListener('click', openBox);
-      poster.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBox(); }
+      var boxImg = box.querySelector('img');
+      function openBox(src) { boxImg.src = src; box.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      function closeBox()   { box.classList.remove('open'); document.body.style.overflow = ''; }
+      document.querySelectorAll('.poster-thumb').forEach(function (thumb) {
+        var full = thumb.getAttribute('data-full') || thumb.src;
+        thumb.addEventListener('click', function () { openBox(full); });
+        thumb.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBox(full); }
+        });
       });
       box.addEventListener('click', closeBox);
       document.getElementById('lightbox-close').addEventListener('click', closeBox);
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeBox();
-      });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeBox(); });
+    })();
+
+    // Rotating headline: keep "What flew over," static, cycle the second line.
+    (function () {
+      var rot = document.getElementById('rotator');
+      if (!rot || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var phrases = [
+        "the day they arrived.",
+        "the day you said I do.",
+        "the day you moved in.",
+        "the day everything changed.",
+      ];
+      var i = 0;
+      setInterval(function () {
+        rot.style.opacity = '0';
+        setTimeout(function () {
+          i = (i + 1) % phrases.length;
+          rot.textContent = phrases[i];
+          rot.style.opacity = '1';
+        }, 400);
+      }, 3200);
     })();
   </script>
 
